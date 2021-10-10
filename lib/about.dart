@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'film.dart';
-import 'about.dart';
-import 'news.dart';
 // Uncomment lines 7 and 10 to view the visual layout at runtime.
 // import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
 
