@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 // Uncomment lines 7 and 10 to view the visual layout at runtime.
 // import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
 
-void main() {
-  // debugPaintSizeEnabled = true;
-  runApp(const MyApp());
-}
+// void main() {
+//   // debugPaintSizeEnabled = true;
+//   runApp(const FilmApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class FilmApp extends StatelessWidget {
+  const FilmApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +77,10 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'Flutter layout demo',
+      title: 'Movie Page',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter layout demo'),
+          title: const Text('Movie Page'),
         ),
         body: ListView(
           // crossAxisCount: 1,

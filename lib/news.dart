@@ -1,123 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'dart:async';
+import 'dart:convert';
 // Uncomment lines 7 and 10 to view the visual layout at runtime.
 // import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
 
-void main() {
-  // debugPaintSizeEnabled = true;
-  runApp(const MyApp());
+// void main() {
+//   // debugPaintSizeEnabled = true;
+//   runApp(const NewsApp());
+// }
+
+fetchNews() async {
+  var dio = Dio();
+  Response response = await dio.get(
+      'https://newsdata.io/api/1/news?apikey=pub_1703d15513814134813479a3a17d8310e2ba');
+  // return response;
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return News.fromJson(jsonDecode(response.data));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load news');
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class News {
+  // final int userId;
+  // final int id;
+  final String title;
+
+  News({
+    // required this.userId,
+    // required this.id,
+    required this.title,
+  });
+
+  factory News.fromJson(Map<String, dynamic> json) {
+    return News(
+      // userId: json['userId'],
+      // id: json['id'],
+      title: json['title'],
+    );
+  }
+}
+
+class NewsApp extends StatefulWidget {
+  const NewsApp({Key? key}) : super(key: key);
+
+  @override
+  _NewsAppState createState() => _NewsAppState();
+}
+
+class _NewsAppState extends State<NewsApp> {
+  var futureNews;
+
+  @override
+  void initState() {
+    super.initState();
+    futureNews = fetchNews();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget titleSection = Container(
-      padding: const EdgeInsets.all(40),
-      child: Row(
-        children: [
-          Expanded(
-            /*1*/
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /*2*/
-                Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: const Text(
-                    'Oeschinen Lake Campground',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  'Kandersteg, Switzerland',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          /*3*/
-          Icon(
-            Icons.star,
-            color: Colors.red[500],
-          ),
-          const Text('41'),
-        ],
-      ),
-    );
-
-    Color color = Theme.of(context).primaryColor;
-
-    Widget buttonSection = Row(
-      // crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-      children: [
-        _buildButtonColumn(color, Icons.call, 'News'),
-        _buildButtonColumn(color, Icons.near_me, 'Film'),
-        _buildButtonColumn(color, Icons.share, 'About'),
-      ],
-    );
-
-    Widget textSection = const Padding(
-      padding: EdgeInsets.all(32),
-      child: Text(
-        'Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese '
-        'Alps. Situated 1,578 meters above sea level, it is one of the '
-        'larger Alpine Lakes. A gondola ride from Kandersteg, followed by a '
-        'half-hour walk through pastures and pine forest, leads you to the '
-        'lake, which warms to 20 degrees Celsius in the summer. Activities '
-        'enjoyed here include rowing, and riding the summer toboggan run.',
-        softWrap: true,
-      ),
-    );
-
     return MaterialApp(
-      title: 'Flutter layout demo',
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter layout demo'),
+          title: const Text('Fetch Data Example'),
         ),
-        body: ListView(
-          // crossAxisCount: 1,
-          children: [
-            Image.asset(
-              'assets/lake.jpg',
-              width: 600,
-              height: 240,
-              fit: BoxFit.cover,
-            ),
-            titleSection,
-            buttonSection,
-            textSection,
-          ],
-        ),
-      ),
-    );
-  }
+        body: Center(
+          child: FutureBuilder<News>(
+            future: futureNews,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.title);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
 
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: color),
-        Container(
-          margin: const EdgeInsets.only(top: 8, bottom: 20),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: color,
-            ),
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
           ),
         ),
-      ],
+      ),
     );
   }
 }
