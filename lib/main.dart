@@ -130,7 +130,7 @@ void main() => runApp(
         initialRoute: '/',
         routes: {
           '/': (context) => const MyApp(),
-          '/news': (context) => const news.NewsApp(),
+          '/news': (context) => news.NewsPage(),
           '/movie': (context) => const film.FilmApp(),
           '/about': (context) => const about.AboutApp(),
         },
