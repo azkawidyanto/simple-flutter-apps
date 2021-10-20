@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-// Uncomment lines 7 and 10 to view the visual layout at runtime.
-// import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
-
-// void main() {
-//   // debugPaintSizeEnabled = true;
-//   runApp(const FilmApp());
-// }
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class FilmApp extends StatelessWidget {
   const FilmApp({Key? key}) : super(key: key);
@@ -50,19 +44,6 @@ class FilmApp extends StatelessWidget {
       ),
     );
 
-    Color color = Theme.of(context).primaryColor;
-
-    Widget buttonSection = Row(
-      // crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-      children: [
-        _buildButtonColumn(color, Icons.call, 'News'),
-        _buildButtonColumn(color, Icons.near_me, 'Film'),
-        _buildButtonColumn(color, Icons.share, 'About'),
-      ],
-    );
-
     Widget textSection = const Padding(
       padding: EdgeInsets.all(32),
       child: Text(
@@ -76,7 +57,9 @@ class FilmApp extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
+    return GraphQLProvider(
+        // client: client,
+        child: MaterialApp(
       title: 'Movie Page',
       home: Scaffold(
         appBar: AppBar(
@@ -85,39 +68,11 @@ class FilmApp extends StatelessWidget {
         body: ListView(
           // crossAxisCount: 1,
           children: [
-            Image.asset(
-              'assets/lake.jpg',
-              width: 600,
-              height: 240,
-              fit: BoxFit.cover,
-            ),
             titleSection,
-            buttonSection,
             textSection,
           ],
         ),
       ),
-    );
-  }
-
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: color),
-        Container(
-          margin: const EdgeInsets.only(top: 8, bottom: 20),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: color,
-            ),
-          ),
-        ),
-      ],
-    );
+    ));
   }
 }

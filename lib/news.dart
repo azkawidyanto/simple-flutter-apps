@@ -1,8 +1,9 @@
-// import 'dart:html';
+// // import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+// import 'package:sqflite/sqflite.dart';
 
 class NewsPage extends StatefulWidget {
   @override
@@ -13,39 +14,29 @@ class News {
   // save json data inside this
   List<ArticleModel> datatobesavedin = [];
 
-  Future<List> getNews() async {
+  Future<List<ArticleModel>> getNews() async {
     Dio dio = new Dio();
     const url =
         'https://newsdata.io/api/1/news?apikey=pub_1703d15513814134813479a3a17d8310e2ba';
-    final response = await dio.get(url);
-    var jsonData = jsonDecode(response.data);
+    var response = await dio.get(url);
+    print(response);
+    final jsonData = jsonDecode(response.data);
     return jsonData;
   }
 }
 
 class ArticleModel {
   String? title;
-  String? description;
-  String? url;
-  String? urlToImage;
 
-  ArticleModel({this.title, this.description, this.url, this.urlToImage});
+  ArticleModel({this.title});
 }
 
 class _NewsPageState extends State<NewsPage> {
-  // get our categories list
-
-  // List<CategoryModel> categories = List<CategoryModel>();
-
-  // get our newslist first
-
-  // ignore: deprecated_member_use
   List<ArticleModel> articles = <ArticleModel>[];
   bool _loading = true;
 
   getNews() async {
     News newsdata = News();
-    // await newsdata.getNews();
     articles = newsdata.getNews() as List<ArticleModel>;
     setState(() {
       _loading = false;
@@ -55,7 +46,7 @@ class _NewsPageState extends State<NewsPage> {
   @override
   void initState() {
     super.initState();
-    // categories = getCategories();
+
     getNews();
   }
 
@@ -66,8 +57,7 @@ class _NewsPageState extends State<NewsPage> {
         backgroundColor: Colors.white,
         elevation: 0.0,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment
-              .center, // this is to bring the row text in center
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               "Flutter ",
@@ -80,8 +70,6 @@ class _NewsPageState extends State<NewsPage> {
           ],
         ),
       ),
-
-      // category widgets
       body: _loading
           ? Center(
               child: CircularProgressIndicator(),
@@ -95,12 +83,10 @@ class _NewsPageState extends State<NewsPage> {
                       child: ListView.builder(
                         itemCount: articles.length,
                         physics: ClampingScrollPhysics(),
-                        shrinkWrap: true, // add this otherwise an error
+                        shrinkWrap: true,
                         itemBuilder: (context, index) {
                           return NewsTemplate(
-                            urlToImage: articles[index].urlToImage,
                             title: articles[index].title,
-                            description: articles[index].description,
                           );
                         },
                       ),
@@ -113,13 +99,15 @@ class _NewsPageState extends State<NewsPage> {
   }
 }
 
-// creating template for news
-
-// ignore: must_be_immutable
-class NewsTemplate extends StatelessWidget {
-  String? title, description, url, urlToImage;
+class NewsTemplate extends StatefulWidget {
+  final String? title, description, url, urlToImage;
   NewsTemplate({this.title, this.description, this.urlToImage, this.url});
 
+  @override
+  State<NewsTemplate> createState() => _NewsTemplateState();
+}
+
+class _NewsTemplateState extends State<NewsTemplate> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -129,7 +117,7 @@ class NewsTemplate extends StatelessWidget {
           ClipRRect(borderRadius: BorderRadius.circular(6)),
           SizedBox(height: 8),
           Text(
-            title!,
+            widget.title!,
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18.0,
@@ -137,7 +125,7 @@ class NewsTemplate extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            description!,
+            widget.description!,
             style: TextStyle(fontSize: 15.0, color: Colors.grey[800]),
           ),
         ],
