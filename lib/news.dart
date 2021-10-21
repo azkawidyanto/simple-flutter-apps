@@ -12,23 +12,71 @@ class NewsPage extends StatefulWidget {
 
 class News {
   // save json data inside this
-  List<ArticleModel> datatobesavedin = [];
 
-  Future<List<ArticleModel>> getNews() async {
+  Future<bool> getNews() async {
+    List<ArticleModel> datatobesavedin = [];
     Dio dio = new Dio();
     const url =
         'https://newsdata.io/api/1/news?apikey=pub_1703d15513814134813479a3a17d8310e2ba';
-    var response = await dio.get(url);
-    print(response);
-    final jsonData = jsonDecode(response.data);
-    return jsonData;
+    Response response = await dio.get(url);
+    print(response.data);
+    response.data.forEach((data) {
+      ArticleModel news = ArticleModel.fromMap(data.results);
+      datatobesavedin.add(news);
+    });
+    return true;
   }
 }
 
 class ArticleModel {
-  String? title;
+  String? title,
+      keywords,
+      creator,
+      pubDate,
+      videoUrl,
+      description,
+      content,
+      imageUrl;
 
-  ArticleModel({this.title});
+  ArticleModel(
+      {this.title,
+      this.keywords,
+      this.creator,
+      this.pubDate,
+      this.videoUrl,
+      this.description,
+      this.content,
+      this.imageUrl});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'keywords': keywords,
+      'creator': creator,
+      'pub_date': pubDate,
+      'video_url': videoUrl,
+      'descrription': description,
+      'content': content,
+      'image_url': imageUrl
+    };
+  }
+
+  factory ArticleModel.fromMap(Map<String, dynamic> map) {
+    return ArticleModel(
+        title: map['title'],
+        keywords: map['keywrds'],
+        creator: map['creator'],
+        pubDate: map['pub_date'],
+        videoUrl: map['video_url'],
+        description: map['description'],
+        content: map['content'],
+        imageUrl: map['image_url']);
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ArticleModel.fromJson(String source) =>
+      ArticleModel.fromMap(json.decode(source));
 }
 
 class _NewsPageState extends State<NewsPage> {
@@ -37,7 +85,7 @@ class _NewsPageState extends State<NewsPage> {
 
   getNews() async {
     News newsdata = News();
-    articles = newsdata.getNews() as List<ArticleModel>;
+    articles = await newsdata.getNews() as List<ArticleModel>;
     setState(() {
       _loading = false;
     });
@@ -100,8 +148,8 @@ class _NewsPageState extends State<NewsPage> {
 }
 
 class NewsTemplate extends StatefulWidget {
-  final String? title, description, url, urlToImage;
-  NewsTemplate({this.title, this.description, this.urlToImage, this.url});
+  final String? title;
+  NewsTemplate({this.title});
 
   @override
   State<NewsTemplate> createState() => _NewsTemplateState();
@@ -122,11 +170,6 @@ class _NewsTemplateState extends State<NewsTemplate> {
                 fontWeight: FontWeight.bold,
                 fontSize: 18.0,
                 color: Colors.black),
-          ),
-          SizedBox(height: 8),
-          Text(
-            widget.description!,
-            style: TextStyle(fontSize: 15.0, color: Colors.grey[800]),
           ),
         ],
       ),
